@@ -40,43 +40,13 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
     @Produces(MediaType.APPLICATION_JSON)
     fun PartyAEndpoint(): Response {
 
-        rpcOps.startFlow(::Initiator_A).returnValue.get()
+//        rpcOps.startFlow(::Initiator_A).returnValue.get()
 
         return Response.ok("partyA Initiator called").build()
     }
 
 
-    @GET
-    @Path("partyB")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun PartyBEndpoint(): Response {
 
-        rpcOps.startFlow(::Initiator_B).returnValue.get()
-
-        return Response.ok("partyB Initiator called").build()
-    }
-
-
-    @GET
-    @Path("partyA2")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun PartyA2Endpoint(): Response {
-
-        rpcOps.startFlow(::Initiator_A2).returnValue.get()
-
-        return Response.ok("partyA Initiator_A2 called").build()
-    }
-
-
-    @GET
-    @Path("partyB2")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun PartyB2Endpoint(): Response {
-
-        rpcOps.startFlow(::Initiator_B2).returnValue.get()
-
-        return Response.ok("partyB Initiator_B2 called").build()
-    }
 }
 
 @Path("vault")
@@ -103,34 +73,20 @@ class VaultApi(val rpcOps: CordaRPCOps) {
  * Initiators for responders using flow inheritance
  */
 
-@InitiatingFlow
-@StartableByRPC
-class Initiator_A: CommonInitiator("PartyA data")
 
-@InitiatingFlow
-@StartableByRPC
-class Initiator_B: CommonInitiator("PartyB data")
+//@StartableByRPC
+//class Initiator_A: CommonInitiator("PartyA data"){
+//
+//}
 
-
-/**
- * Initiators for responders using subflows
- */
 
 @InitiatingFlow
-@StartableByRPC
-class Initiator_A2: CommonInitiator("PartyA2 data")
-
-@InitiatingFlow
-@StartableByRPC
-class Initiator_B2: CommonInitiator("PartyB2 data")
-
-
 open class CommonInitiator(val data: String) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
         // Flow implementation goes here
 
-        logger.info("MB: CommonInitiator called")
+        logger.info("MB: CommonInitiator called with data: $data")
 
         val partyCX500 = CordaX500Name("PartyC","Paris","FR")
         val me: Party = serviceHub.myInfo.legalIdentities.single()
@@ -167,13 +123,21 @@ open class CommonInitiator(val data: String) : FlowLogic<Unit>() {
  */
 
 
-@InitiatedBy(Initiator_A::class)
-class Responder_A(counterpartySession: FlowSession) : CommonResponder(counterpartySession)
+//@InitiatedBy(CommonInitiator::class)
+//class Responder_A(counterpartySession: FlowSession) : CommonResponder(counterpartySession){
+//    init {
+//        println("MB: Responder_A called")
+//    }
+//}
 
-@InitiatedBy(Initiator_B::class)
-class Responder_B(counterpartySession: FlowSession) : CommonResponder(counterpartySession)
 
+@InitiatedBy(CommonInitiator::class)
 open class CommonResponder(val counterpartySession: FlowSession) : FlowLogic<Unit>() {
+    init {
+        println("MB: CommonResponder called")
+    }
+
+
     @Suspendable
     override fun call() {
 
@@ -195,45 +159,6 @@ open class CommonResponder(val counterpartySession: FlowSession) : FlowLogic<Uni
 /**
  * responders using subflows
  */
-
-@InitiatedBy(Initiator_A2::class)
-class Responder_A2(val counterpartySession: FlowSession) : FlowLogic<Unit>(){
-
-    @Suspendable
-    override fun call() {
-        val flow = CommonResponder_2(counterpartySession)
-        subFlow(flow)
-    }
-}
-
-@InitiatedBy(Initiator_B2::class)
-class Responder_B2(val counterpartySession: FlowSession) : FlowLogic<Unit>(){
-
-    @Suspendable
-    override fun call() {
-        val flow = CommonResponder_2(counterpartySession)
-        subFlow(flow)
-    }
-}
-
-
-open class CommonResponder_2 (val counterpartySession: FlowSession) : FlowLogic<Unit>() {
-    @Suspendable
-    override fun call() {
-
-        logger.info("MB:  ${serviceHub.myInfo.legalIdentities.single().name} Responder flow called from: ${counterpartySession.counterparty.name }")
-
-        val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                val output = stx.tx.outputs.single().data
-                "This must be a Template transaction" using (output is TemplateState)
-            }
-        }
-
-        subFlow(signedTransactionFlow)
-
-    }
-}
 
 
 

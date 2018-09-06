@@ -21,8 +21,8 @@ class FlowTests {
 
     init {
         listOf(a, b, c).forEach {
-            it.registerInitiatedFlow(Responder_A::class.java)
-            it.registerInitiatedFlow(Responder_B::class.java)
+//            it.registerInitiatedFlow(Responder_A::class.java)
+
         }
     }
 
@@ -32,53 +32,25 @@ class FlowTests {
     @After
     fun tearDown() = network.stopNodes()
 
-    @Test
-    fun `partyA test with flow inheritance`() {
+//    @Test
+//    fun `partyA test`() {
+//
+//        val flow = Initiator_A()
+//
+//        val future = a.startFlow(flow)
+//
+//        network.runNetwork()
+//
+//        future.getOrThrow()
+//
+//    }
 
-        val flow = Initiator_A()
+    @Test
+    fun `commonInitiator test`() {
+
+        val flow = CommonInitiator("common initiator data")
 
         val future = a.startFlow(flow)
-
-        network.runNetwork()
-
-        future.getOrThrow()
-
-    }
-
-
-    @Test
-    fun `partyB test with flow inheritance`() {
-
-        val flow = Initiator_B()
-
-        val future = b.startFlow(flow)
-
-        network.runNetwork()
-
-        future.getOrThrow()
-
-    }
-
-    @Test
-    fun `partyA test with subflows`() {
-
-        val flow = Initiator_A2()
-
-        val future = a.startFlow(flow)
-
-        network.runNetwork()
-
-        future.getOrThrow()
-
-    }
-
-
-    @Test
-    fun `partyB test with subflows`() {
-
-        val flow = Initiator_B2()
-
-        val future = b.startFlow(flow)
 
         network.runNetwork()
 
