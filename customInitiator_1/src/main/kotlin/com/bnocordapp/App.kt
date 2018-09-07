@@ -24,47 +24,45 @@ import javax.ws.rs.core.Response
 // *****************
 // * API Endpoints *
 // *****************
-@Path("template")
-class TemplateApi(val rpcOps: CordaRPCOps) {
-    // Accessible at /api/template/templateGetEndpoint.
-    @GET
-    @Path("templateGetEndpoint")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun templateGetEndpoint(): Response {
-        return Response.ok("Template GET endpoint.").build()
-    }
-}
+//@Path("template")
+//class TemplateApi(val rpcOps: CordaRPCOps) {
+//    // Accessible at /api/template/templateGetEndpoint.
+//    @GET
+//    @Path("templateGetEndpoint")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    fun templateGetEndpoint(): Response {
+//        return Response.ok("Template GET endpoint.").build()
+//    }
+//}
 
 @Path("initiate")
 class InitiateApi(val rpcOps: CordaRPCOps) {
 
     @GET
-    @Path("custominitiator_1")
+    @Path("custominitiator_1_topartyc")
     @Produces(MediaType.APPLICATION_JSON)
-    fun PartyAEndpoint(): Response {
+    fun PartyAtoC(): Response {
 
-        rpcOps.startFlow(::CustomInitiator_1).returnValue.get()
+        val me = rpcOps.nodeInfo().legalIdentities.first().name
+        val x500 = CordaX500Name("PartyC","Paris","FR")
+        rpcOps.startFlow(::CustomInitiator_1, "CustomInitiator_1 data from a to c", x500).returnValue.get()
 
-        return Response.ok("partyA Initiator called").build()
+        return Response.ok("CustomInitiator_1 called from $me to $x500").build()
+    }
+    @GET
+    @Path("custominitiator_1_topartyd")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun PartyAtoD(): Response {
+
+        val me = rpcOps.nodeInfo().legalIdentities.first().name
+        val x500 = CordaX500Name("PartyD","Milan","IT")
+        rpcOps.startFlow(::CustomInitiator_1, "CustomInitiator_1 data from a to d", x500).returnValue.get()
+
+        return Response.ok("CustomInitiator_1 called from $me to $x500").build()
     }
 
 
-
 }
-
-//@Path("vault")
-//class VaultApi(val rpcOps: CordaRPCOps) {
-//    // Accessible at /api/template/templateGetEndpoint.
-//    @GET
-//    @Path("getStates")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    fun templateGetEndpoint(): Response {
-//
-//        val states = rpcOps.vaultQuery(TemplateState::class.java)
-//
-//        return Response.ok(states).build()
-//    }
-//}
 
 
 // *********
@@ -78,7 +76,11 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
 
 
 @StartableByRPC
-class CustomInitiator_1(data: String,  x500: CordaX500Name) : CommonInitiator(data, x500)
+class CustomInitiator_1(data: String,  x500: CordaX500Name) : CommonInitiator(data, x500){
+
+    override fun message(): String = "MB: CustomInitiator_1 called with data: $data"
+
+}
 
 
 
@@ -89,12 +91,12 @@ class CustomInitiator_1(data: String,  x500: CordaX500Name) : CommonInitiator(da
 // ***********
 class TemplateWebPlugin : WebServerPluginRegistry {
     // A list of lambdas that create objects exposing web JAX-RS REST APIs.
-    override val webApis: List<Function<CordaRPCOps, out Any>> = listOf(Function(::TemplateApi), Function(::InitiateApi))
+    override val webApis: List<Function<CordaRPCOps, out Any>> = listOf(Function(::InitiateApi))
     //A list of directories in the resources directory that will be served by Jetty under /web.
     // This template's web frontend is accessible at /web/template.
     override val staticServeDirs: Map<String, String> = mapOf(
         // This will serve the templateWeb directory in resources to /web/template
-        "template" to javaClass.classLoader.getResource("templateWeb").toExternalForm()
+        "templatex" to javaClass.classLoader.getResource("templateWeb").toExternalForm()
     )
 }
 

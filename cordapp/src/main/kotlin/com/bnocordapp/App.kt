@@ -38,25 +38,27 @@ class TemplateApi(val rpcOps: CordaRPCOps) {
 class InitiateApi(val rpcOps: CordaRPCOps) {
 
     @GET
-    @Path("commoninitiator_toPartyC")
+    @Path("commoninitiator_topartyc")
     @Produces(MediaType.APPLICATION_JSON)
     fun PartyAtoC(): Response {
 
+        val me = rpcOps.nodeInfo().legalIdentities.first().name
         val x500 = CordaX500Name("PartyC","Paris","FR")
-        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data", x500).returnValue.get()
+        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data from a to c", x500).returnValue.get()
 
-        return Response.ok("partyA Initiator called").build()
+        return Response.ok("CommonInitiator called from $me to $x500").build()
     }
 
     @GET
-    @Path("commoninitiator_toPartyD")
+    @Path("commoninitiator_topartyd")
     @Produces(MediaType.APPLICATION_JSON)
     fun PartyAtoD(): Response {
 
+        val me = rpcOps.nodeInfo().legalIdentities.first().name
         val x500 = CordaX500Name("PartyD","Milan","IT")
-        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data", x500).returnValue.get()
+        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data from a to d", x500).returnValue.get()
 
-        return Response.ok("partyA Initiator called").build()
+        return Response.ok("CommonInitiator called from $me to $x500").build()
     }
 
 }
@@ -65,9 +67,9 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
 class VaultApi(val rpcOps: CordaRPCOps) {
     // Accessible at /api/template/templateGetEndpoint.
     @GET
-    @Path("getStates")
+    @Path("getstates")
     @Produces(MediaType.APPLICATION_JSON)
-    fun templateGetEndpoint(): Response {
+    fun getVaultStates(): Response {
 
         val states = rpcOps.vaultQuery(TemplateState::class.java)
 
@@ -92,21 +94,21 @@ open class CommonInitiator(val data: String, val x500: CordaX500Name) : FlowLogi
     override fun call() {
         // Flow implementation goes here
 
-        logger.info("MB: CommonInitiator called with data: $data")
+        logger.info(message())
 
-//        val partyCX500 = CordaX500Name("PartyC","Paris","FR")
+
         val me: Party = serviceHub.myInfo.legalIdentities.single()
-        val partyCOrNull: Party? = serviceHub.networkMapCache.getPeerByLegalName(x500)
+        val partyOrNull: Party? = serviceHub.networkMapCache.getPeerByLegalName(x500)
 
-        logger.info("MB: partyorNull = $partyCOrNull")
+//        logger.info("MB: partyorNull = $partyCOrNull")
 
-        if (partyCOrNull != null) {
-            logger.info("Party $x500 found")
+        if (partyOrNull != null) {
+            logger.info("MB: Party $x500 found")
         } else {
-            logger.info("PartyC $x500 not found")
-            throw(FlowException("Party $x500 not Found"))
+            logger.info("MB: artyC $x500 not found")
+            throw(FlowException("MB: Party $x500 not Found"))
         }
-        val party: Party = partyCOrNull!!
+        val party: Party = partyOrNull
         val state = TemplateState(data, listOf(me, party))
 
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
@@ -121,6 +123,8 @@ open class CommonInitiator(val data: String, val x500: CordaX500Name) : FlowLogi
         val ftx = subFlow(FinalityFlow(stx))
 
     }
+
+    open fun message(): String = "MB: CommonInitiator called with data: $data"
 }
 
 
@@ -142,12 +146,17 @@ open class CommonResponder(val counterpartySession: FlowSession) : FlowLogic<Uni
 
         logger.info("MB:  ${serviceHub.myInfo.legalIdentities.single().name} Responder flow called from: ${counterpartySession.counterparty.name }")
 
+
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
                 val output = stx.tx.outputs.single().data
+                val state = stx.tx.toLedgerTransaction(serviceHub).outputStates[0] as TemplateState
+                logger.info("MB: data package received: ${state.data}")
+
                 "This must be a Template transaction" using (output is TemplateState)
             }
         }
+
 
         subFlow(signedTransactionFlow)
 
