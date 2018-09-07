@@ -1,4 +1,4 @@
-package com.bnocordapp
+package com.customInitiator_1
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow
@@ -32,15 +32,12 @@ class FlowTests {
     @After
     fun tearDown() = network.stopNodes()
 
-
-
     @Test
-    fun `commonInitiator test`() {
-
+    fun `CustomInitiator_1 test`() {
 
         val x500 = CordaX500Name("PartyC","Paris","FR")
 
-        val flow = CommonInitiator("CommonInitiator data", x500)
+        val flow = CustomInitiator_1("CustomInitiator_1 data", x500)
 
         val future = a.startFlow(flow)
 
@@ -49,5 +46,7 @@ class FlowTests {
         future.getOrThrow()
 
     }
+
+
 
 }

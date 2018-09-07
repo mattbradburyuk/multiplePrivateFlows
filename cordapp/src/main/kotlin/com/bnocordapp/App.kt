@@ -1,11 +1,14 @@
 package com.bnocordapp
 
 import co.paralleluniverse.fibers.Suspendable
+import com.bnocordapp.TemplateContract
+import com.bnocordapp.TemplateState
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.messaging.CordaRPCOps
+import net.corda.core.messaging.startFlow
 import net.corda.core.serialization.SerializationWhitelist
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
@@ -35,16 +38,26 @@ class TemplateApi(val rpcOps: CordaRPCOps) {
 class InitiateApi(val rpcOps: CordaRPCOps) {
 
     @GET
-    @Path("partyA")
+    @Path("commoninitiator_toPartyC")
     @Produces(MediaType.APPLICATION_JSON)
-    fun PartyAEndpoint(): Response {
+    fun PartyAtoC(): Response {
 
-//        rpcOps.startFlow(::Initiator_A).returnValue.get()
+        val x500 = CordaX500Name("PartyC","Paris","FR")
+        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data", x500).returnValue.get()
 
         return Response.ok("partyA Initiator called").build()
     }
 
+    @GET
+    @Path("commoninitiator_toPartyD")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun PartyAtoD(): Response {
 
+        val x500 = CordaX500Name("PartyD","Milan","IT")
+        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data", x500).returnValue.get()
+
+        return Response.ok("partyA Initiator called").build()
+    }
 
 }
 
@@ -73,43 +86,37 @@ class VaultApi(val rpcOps: CordaRPCOps) {
  */
 
 
-@StartableByRPC
-class Initiator_A: CommonInitiator("PartyA data"){
-
-}
-
-
 @InitiatingFlow
-open class CommonInitiator(val data: String) : FlowLogic<Unit>() {
+open class CommonInitiator(val data: String, val x500: CordaX500Name) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
         // Flow implementation goes here
 
         logger.info("MB: CommonInitiator called with data: $data")
 
-        val partyCX500 = CordaX500Name("PartyC","Paris","FR")
+//        val partyCX500 = CordaX500Name("PartyC","Paris","FR")
         val me: Party = serviceHub.myInfo.legalIdentities.single()
-        val partyCOrNull: Party? = serviceHub.networkMapCache.getPeerByLegalName(partyCX500)
+        val partyCOrNull: Party? = serviceHub.networkMapCache.getPeerByLegalName(x500)
 
-        logger.info("MB: partyCorNull = $partyCOrNull")
+        logger.info("MB: partyorNull = $partyCOrNull")
 
         if (partyCOrNull != null) {
-            logger.info("PartyC found")
+            logger.info("Party $x500 found")
         } else {
-            logger.info("PartyC not found")
-            throw(FlowException("PartyC not Found"))
+            logger.info("PartyC $x500 not found")
+            throw(FlowException("Party $x500 not Found"))
         }
-        val partyC: Party = partyCOrNull!!
-        val state = TemplateState(data, listOf(me, partyC))
+        val party: Party = partyCOrNull!!
+        val state = TemplateState(data, listOf(me, party))
 
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val tx = TransactionBuilder(notary)
         tx.addOutputState(state, TemplateContract.ID)
-        tx.addCommand(TemplateContract.Commands.Action(), me.owningKey, partyC.owningKey)
+        tx.addCommand(TemplateContract.Commands.Action(), me.owningKey, party.owningKey)
         tx.verify(serviceHub)
 
         val ptx = serviceHub.signInitialTransaction(tx)
-        val session = initiateFlow(partyC)
+        val session = initiateFlow(party)
         val stx = subFlow(CollectSignaturesFlow(ptx, listOf(session)))
         val ftx = subFlow(FinalityFlow(stx))
 
@@ -121,13 +128,6 @@ open class CommonInitiator(val data: String) : FlowLogic<Unit>() {
  * Responders using flow inheritance
  */
 
-
-@InitiatedBy(CommonInitiator::class)
-class Responder_A(counterpartySession: FlowSession) : CommonResponder(counterpartySession){
-    init {
-        println("MB: Responder_A called")
-    }
-}
 
 
 @InitiatedBy(CommonInitiator::class)
@@ -154,10 +154,6 @@ open class CommonResponder(val counterpartySession: FlowSession) : FlowLogic<Uni
     }
 }
 
-
-/**
- * responders using subflows
- */
 
 
 
