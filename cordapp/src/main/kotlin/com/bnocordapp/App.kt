@@ -1,4 +1,4 @@
-package com.template
+package com.bnocordapp
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.requireThat
@@ -6,7 +6,6 @@ import net.corda.core.flows.*
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.messaging.CordaRPCOps
-import net.corda.core.messaging.startFlow
 import net.corda.core.serialization.SerializationWhitelist
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder

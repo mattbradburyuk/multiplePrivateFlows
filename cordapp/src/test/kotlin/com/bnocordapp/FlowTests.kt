@@ -1,4 +1,4 @@
-package com.template
+package com.bnocordapp
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow
@@ -9,7 +9,7 @@ import org.junit.Test
 
 class FlowTests {
 
-    private val network = MockNetwork(listOf("com.template"))
+    private val network = MockNetwork(listOf("com.bnocordapp"))
 
     val aX500 = CordaX500Name("PartyA","London","GB")
     val bX500 = CordaX500Name("PartyB","New York","US")

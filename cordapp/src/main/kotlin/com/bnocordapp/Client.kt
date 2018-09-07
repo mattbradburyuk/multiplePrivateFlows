@@ -1,4 +1,4 @@
-package com.template
+package com.bnocordapp
 
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.contracts.StateAndRef
