@@ -32,18 +32,18 @@ class FlowTests {
     @After
     fun tearDown() = network.stopNodes()
 
-//    @Test
-//    fun `partyA test`() {
-//
-//        val flow = Initiator_A()
-//
-//        val future = a.startFlow(flow)
-//
-//        network.runNetwork()
-//
-//        future.getOrThrow()
-//
-//    }
+    @Test
+    fun `partyA test`() {
+
+        val flow = Initiator_A()
+
+        val future = a.startFlow(flow)
+
+        network.runNetwork()
+
+        future.getOrThrow()
+
+    }
 
     @Test
     fun `commonInitiator test`() {

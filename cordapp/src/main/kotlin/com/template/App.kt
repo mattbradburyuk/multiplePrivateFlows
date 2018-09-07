@@ -74,10 +74,10 @@ class VaultApi(val rpcOps: CordaRPCOps) {
  */
 
 
-//@StartableByRPC
-//class Initiator_A: CommonInitiator("PartyA data"){
-//
-//}
+@StartableByRPC
+class Initiator_A: CommonInitiator("PartyA data"){
+
+}
 
 
 @InitiatingFlow
@@ -123,12 +123,12 @@ open class CommonInitiator(val data: String) : FlowLogic<Unit>() {
  */
 
 
-//@InitiatedBy(CommonInitiator::class)
-//class Responder_A(counterpartySession: FlowSession) : CommonResponder(counterpartySession){
-//    init {
-//        println("MB: Responder_A called")
-//    }
-//}
+@InitiatedBy(CommonInitiator::class)
+class Responder_A(counterpartySession: FlowSession) : CommonResponder(counterpartySession){
+    init {
+        println("MB: Responder_A called")
+    }
+}
 
 
 @InitiatedBy(CommonInitiator::class)
