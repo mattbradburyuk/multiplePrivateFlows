@@ -87,7 +87,7 @@ class VaultApi(val rpcOps: CordaRPCOps) {
  * Initiators for responders using flow inheritance
  */
 
-
+@StartableByRPC
 @InitiatingFlow
 open class CommonInitiator(val data: String, val x500: CordaX500Name) : FlowLogic<Unit>() {
     @Suspendable
