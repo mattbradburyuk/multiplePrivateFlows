@@ -3,6 +3,7 @@ package com.bnocordapp
 import co.paralleluniverse.fibers.Suspendable
 import com.bnocordapp.TemplateContract
 import com.bnocordapp.TemplateState
+import net.corda.core.contracts.StateRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.CordaX500Name
@@ -71,9 +72,26 @@ class VaultApi(val rpcOps: CordaRPCOps) {
     @Produces(MediaType.APPLICATION_JSON)
     fun getVaultStates(): Response {
 
-        val states = rpcOps.vaultQuery(TemplateState::class.java)
+        val result = rpcOps.vaultQuery(TemplateState::class.java)
 
-        return Response.ok(states).build()
+//        println("result: ")
+//
+//        val num_results = result.states.size
+//
+//        val list = mutableListOf<String>()
+//
+//        for(i in 0..num_results){
+//
+//            list.add(i, "${result.statesMetadata[i].recordedTime}:  ${result.states[i].state.data.data} /n")
+//        }
+//
+//
+//        return Response.ok(list).build()
+
+
+        val response = result.states.asReversed().map { "${it.state.data.data} \n "}.toString()
+
+        return Response.ok(response).build()
     }
 }
 
