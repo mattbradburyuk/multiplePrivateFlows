@@ -45,9 +45,11 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
 
         val me = rpcOps.nodeInfo().legalIdentities.first().name
         val x500 = CordaX500Name("PartyC","Paris","FR")
-        rpcOps.startFlow(::CustomInitiator_1, "CustomInitiator_1 data from $me to $x500", x500).returnValue.get()
+        val route = "${me.organisation} to ${x500.organisation}"
 
-        return Response.ok("CustomInitiator_1 called from $me to $x500").build()
+        rpcOps.startFlow(::CustomInitiator_1, "CustomInitiator_1 data from $route", x500).returnValue.get()
+
+        return Response.ok("CustomInitiator_1 called from $route").build()
     }
     @GET
     @Path("custominitiator_1_topartyd")
@@ -56,9 +58,11 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
 
         val me = rpcOps.nodeInfo().legalIdentities.first().name
         val x500 = CordaX500Name("PartyD","Milan","IT")
-        rpcOps.startFlow(::CustomInitiator_1, "CustomInitiator_1 data from $me to $x500", x500).returnValue.get()
+        val route = "${me.organisation} to ${x500.organisation}"
 
-        return Response.ok("CustomInitiator_1 called from $me to $x500").build()
+        rpcOps.startFlow(::CustomInitiator_1, "CustomInitiator_1 data from $route", x500).returnValue.get()
+
+        return Response.ok("CustomInitiator_1 called from $route").build()
     }
 
 

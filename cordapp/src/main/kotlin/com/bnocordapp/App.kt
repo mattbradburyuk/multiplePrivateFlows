@@ -45,9 +45,11 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
 
         val me = rpcOps.nodeInfo().legalIdentities.first().name
         val x500 = CordaX500Name("PartyC","Paris","FR")
-        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data from $me to $x500", x500).returnValue.get()
+        val route = "${me.organisation} to ${x500.organisation}"
 
-        return Response.ok("CommonInitiator called from $me to $x500").build()
+        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data from $route", x500).returnValue.get()
+
+        return Response.ok("CommonInitiator called from $route").build()
     }
 
     @GET
@@ -57,9 +59,11 @@ class InitiateApi(val rpcOps: CordaRPCOps) {
 
         val me = rpcOps.nodeInfo().legalIdentities.first().name
         val x500 = CordaX500Name("PartyD","Milan","IT")
-        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data from $me to $x500", x500).returnValue.get()
+        val route = "${me.organisation} to ${x500.organisation}"
 
-        return Response.ok("CommonInitiator called from $me to $x500").build()
+        rpcOps.startFlow(::CommonInitiator, "CommonInitiator data from $route", x500).returnValue.get()
+
+        return Response.ok("CommonInitiator called from $route").build()
     }
 
 }
