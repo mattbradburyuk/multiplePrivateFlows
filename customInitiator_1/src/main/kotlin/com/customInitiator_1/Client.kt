@@ -1,5 +1,6 @@
-package com.bnocordapp
+package com.customInitiator_1
 
+import com.bnocordapp.TemplateState
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.utilities.NetworkHostAndPort.Companion.parse
