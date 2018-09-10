@@ -1,3 +1,4 @@
 include 'cordapp'
 include 'customInitiator_1'
+include 'customResponder_1'
 include 'cordapp-contracts-states'
