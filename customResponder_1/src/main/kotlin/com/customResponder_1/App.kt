@@ -27,10 +27,12 @@ import java.util.function.Function
 
 
 @InitiatedBy(CommonInitiator::class)
-open class customResponder_1(counterpartySession: FlowSession) : CommonResponder(counterpartySession) {
+class CustomResponder_1(counterpartySession: FlowSession) : CommonResponder(counterpartySession) {
     init {
-        println("MB: CustomResponder_1 called")
+        println("\nCustomResponder_1 called\n")
     }
+
+    override fun responderType(): String = "CustomResponder_1"
 }
 
 // ***********

@@ -23,8 +23,8 @@ class FlowTests {
     private val d = network.createNode(dX500)
 
     init {
-        listOf(a, b, c, d).forEach {
-//            it.registerInitiatedFlow(Responder_A::class.java)
+        listOf(d).forEach {
+//            it.registerInitiatedFlow(CustomResponder_1::class.java)  // only register the CustomerResponder_1 for party D
 
         }
     }
@@ -38,6 +38,8 @@ class FlowTests {
     @Test
     fun `CommonInitiator test a to c`() {
 
+        // Should log response from CommonResponder
+
         val flow = CommonInitiator("CommonInitiator data a to c", cX500)
         val future = a.startFlow(flow)
         network.runNetwork()
@@ -47,6 +49,8 @@ class FlowTests {
 
     @Test
     fun `CommonInitiator test a to d`() {
+
+        // Should log response from CustomResponder_1
 
         val flow = CommonInitiator("CommonInitiator data a to d", dX500)
         val future = a.startFlow(flow)

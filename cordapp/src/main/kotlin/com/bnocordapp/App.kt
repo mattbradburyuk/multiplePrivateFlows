@@ -146,7 +146,7 @@ open class CommonInitiator(val data: String, val x500: CordaX500Name) : FlowLogi
 
     }
 
-    open fun message(): String = "MB: CommonInitiator called with data: $data"
+    open fun message(): String = "\nMB: CommonInitiator called with data: $data\n"
 }
 
 
@@ -155,25 +155,30 @@ open class CommonInitiator(val data: String, val x500: CordaX500Name) : FlowLogi
  */
 
 
+//@InitiatedBy(CommonInitiator::class)
+//class CustomResponder_1(counterpartySession: FlowSession) : CommonResponder(counterpartySession) {
+//    init {
+//        println("\nCustomResponder_1 called\n")
+//    }
+//    override fun responderType(): String = "CustomResponder_1"
+//}
 
 @InitiatedBy(CommonInitiator::class)
 open class CommonResponder(val counterpartySession: FlowSession) : FlowLogic<Unit>() {
-    init {
-        println("MB: CommonResponder called")
-    }
 
+    open fun responderType(): String = "CommonResponder"
 
     @Suspendable
     override fun call() {
 
-        logger.info("MB:  ${serviceHub.myInfo.legalIdentities.single().name} Responder flow called from: ${counterpartySession.counterparty.name }")
+        logger.info("\nMB: ${responderType()} flow for ${serviceHub.myInfo.legalIdentities.single().name.organisation} responding to initiated flow from ${counterpartySession.counterparty.name.organisation }\n")
 
 
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
                 val output = stx.tx.outputs.single().data
                 val state = stx.tx.toLedgerTransaction(serviceHub).outputStates[0] as TemplateState
-                logger.info("MB: data package received: ${state.data}")
+                logger.info("\nMB: data package received: ${state.data}\n")
 
                 "This must be a Template transaction" using (output is TemplateState)
             }
