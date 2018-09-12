@@ -1,6 +1,6 @@
 
 
-# Work in progress - doesn't work yet
+# Investigate adding Custom initiators and responders to override base (common) flows
 
 ## Objective: 
 
