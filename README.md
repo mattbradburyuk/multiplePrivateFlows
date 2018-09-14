@@ -148,10 +148,10 @@ under `build/nodes/partyX`:
 
 go to root for each node and you can select your action
 
-PartyA (Common initiator and responder only): http://localhost:10007
-PartyB (add CustomInitiator_1): http://localhost:10010
-PartyC (Common initiator and responder only): http://localhost:10013
-PartyD (CustomResponder_1): http://localhost:10016
+- PartyA (Common initiator and responder only): http://localhost:10007
+- PartyB (add CustomInitiator_1): http://localhost:10010
+- PartyC (Common initiator and responder only): http://localhost:10013
+- PartyD (CustomResponder_1): http://localhost:10016
 
 You will need to look at the logs to see the logs. All logging lines called from this code have the prefix 'MB:'
 
