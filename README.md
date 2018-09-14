@@ -2,6 +2,8 @@
 
 # Investigate adding Custom initiators and responders to override base (common) flows
 
+Note, only the initiators worked reliably.
+
 ## Objective: 
 
 - Create a cordapp (cordapp) with an initiating (commonInitiator) and initiatedBy (CustomResponder_1) Flow'
