@@ -72,11 +72,11 @@ Conversely, when the name is modified to 'aCustomResponder_1' it finds the @Init
 
 Conclusion and follow on:
 
-The above Custom Responder pattern should not be used as relying on alphabetical ordering of Classes is not a robust approach
+- The above Custom Responder pattern should not be used as relying on alphabetical ordering of Classes is not a robust approach
 
-Raise a corda bug fix for the indeterminate behaviour
+- Raise a corda bug fix for the indeterminate behaviour
 
-Raise a request for interfaces in the @initiatedBy() annotation so that flows can subscribe to an interface rather than have to point to a concrete class with the @InitiatingFlow annotation.
+- Raise a request for interfaces in the @initiatedBy() annotation so that flows can subscribe to an interface rather than have to point to a concrete class with the @InitiatingFlow annotation.
 
 
 ## Getting Set Up
